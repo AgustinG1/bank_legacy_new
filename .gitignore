@@ -1,0 +1,11 @@
+target/
+output/
+evidencias/
+.docx_work/
+*.log
+.env
+.env.*
+application-local.properties
+.idea/
+.vscode/
+*.iml
