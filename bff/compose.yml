@@ -1,0 +1,77 @@
+x-bff-environment: &bff-environment
+  BANK_WEB_IDENTITIES: ${BANK_WEB_IDENTITIES:?Use token=record_key para cada identidad web}
+  BANK_MOBILE_IDENTITIES: ${BANK_MOBILE_IDENTITIES:?Use token=record_key para cada identidad movil}
+  BANK_ATM_IDENTITIES: ${BANK_ATM_IDENTITIES:?Use token=record_key para cada identidad de cajero}
+  BANK_WEB_USERNAME: ${BANK_WEB_USERNAME:-web-demo}
+  BANK_WEB_PASSWORD: ${BANK_WEB_PASSWORD:-WebDemo2026!}
+  BANK_MOBILE_USERNAME: ${BANK_MOBILE_USERNAME:-mobile-demo}
+  BANK_MOBILE_PASSWORD: ${BANK_MOBILE_PASSWORD:-MobileDemo2026!}
+  BANK_ATM_PIN: ${BANK_ATM_PIN:-1234}
+  BANK_ATM_TERMINAL: ${BANK_ATM_TERMINAL:-ATM-001}
+  BANK_ATM_TERMINAL_KEY: ${BANK_ATM_TERMINAL_KEY:-AtmTerminal2026!}
+  BANK_CORE_URL: http://core:8080
+  BANK_REPORTS_URL: http://reports:8084
+  SERVER_ADDRESS: 0.0.0.0
+
+services:
+  core:
+    build:
+      context: ./bff
+      args:
+        MODULE: servicio-bancario
+    image: bank-servicio-bancario:s5
+    environment:
+      <<: *bff-environment
+      DB_URL: jdbc:postgresql://db:5432/bankdb
+    depends_on:
+      db:
+        condition: service_healthy
+  reports:
+    build:
+      context: ./bff
+      args:
+        MODULE: servicio-reportes
+    image: bank-servicio-reportes:s5
+    environment:
+      <<: *bff-environment
+      DB_URL: jdbc:postgresql://db:5432/bankdb
+    depends_on:
+      db:
+        condition: service_healthy
+  bff-web:
+    image: bank-bff-web:s5
+    build:
+      context: ./bff
+      args:
+        MODULE: bff-web
+    environment:
+      <<: *bff-environment
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      - core
+      - reports
+  bff-movil:
+    image: bank-bff-movil:s5
+    build:
+      context: ./bff
+      args:
+        MODULE: bff-movil
+    environment:
+      <<: *bff-environment
+    ports:
+      - "127.0.0.1:8082:8082"
+    depends_on:
+      - core
+  bff-cajero:
+    image: bank-bff-cajero:s5
+    build:
+      context: ./bff
+      args:
+        MODULE: bff-cajero
+    environment:
+      <<: *bff-environment
+    ports:
+      - "127.0.0.1:8083:8083"
+    depends_on:
+      - core

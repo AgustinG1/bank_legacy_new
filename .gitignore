@@ -1,11 +1,32 @@
 target/
 output/
+
+# Evidencias y documentos de entrega
 evidencias/
 .docx_work/
+*.doc
+*.docx
+*.pdf
+*.ppt
+*.pptx
+*.zip
+~$*
+
+# Archivos temporales y de ejecución local
 *.log
+*.tmp
+*.bak
+hs_err_pid*
+
+# Configuración local y secretos
 .env
 .env.*
 application-local.properties
+.tls/
+
+# Configuración del editor y del sistema operativo
 .idea/
 .vscode/
 *.iml
+.DS_Store
+Thumbs.db

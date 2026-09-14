@@ -1,0 +1,44 @@
+x-tls: &tls
+  SERVER_SSL_ENABLED: "true"
+  SERVER_SSL_KEY_STORE: file:/tls/server.p12
+  SERVER_SSL_KEY_STORE_TYPE: PKCS12
+  SERVER_SSL_KEY_STORE_PASSWORD: ${TLS_KEYSTORE_PASSWORD:?Genere los certificados locales primero}
+  SERVER_SSL_ENABLED_PROTOCOLS: TLSv1.2,TLSv1.3
+  BANK_CORE_URL: https://core:8080
+  BANK_REPORTS_URL: https://reports:8084
+  JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/tls/truststore.p12 -Djavax.net.ssl.trustStoreType=PKCS12 -Djavax.net.ssl.trustStorePassword=changeit
+
+services:
+  core:
+    environment:
+      <<: *tls
+    volumes:
+      - ./bff/.tls/core.p12:/tls/server.p12:ro
+      - ./bff/.tls/truststore.p12:/tls/truststore.p12:ro
+  reports:
+    environment:
+      <<: *tls
+    volumes:
+      - ./bff/.tls/reports.p12:/tls/server.p12:ro
+      - ./bff/.tls/truststore.p12:/tls/truststore.p12:ro
+  bff-web:
+    environment:
+      <<: *tls
+    volumes:
+      - ./bff/.tls/bff-web.p12:/tls/server.p12:ro
+      - ./bff/.tls/truststore.p12:/tls/truststore.p12:ro
+  bff-movil:
+    environment:
+      <<: *tls
+    volumes:
+      - ./bff/.tls/bff-movil.p12:/tls/server.p12:ro
+      - ./bff/.tls/truststore.p12:/tls/truststore.p12:ro
+    depends_on:
+      - core
+      - reports
+  bff-cajero:
+    environment:
+      <<: *tls
+    volumes:
+      - ./bff/.tls/bff-cajero.p12:/tls/server.p12:ro
+      - ./bff/.tls/truststore.p12:/tls/truststore.p12:ro
